@@ -6,7 +6,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -15,16 +16,13 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
@@ -33,22 +31,16 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 @SuppressWarnings("deprecation")
@@ -56,7 +48,7 @@ public final class Config {
     static final ForgeConfigSpec SPEC;
     static final ForgeConfigSpec.BooleanValue LOG_SUCCESSFUL;
     static final ForgeConfigSpec.BooleanValue LOG_ERRORS;
-    private static final ForgeConfigSpec.BooleanValue GENERATE_ITEM_GROUPS;
+//    private static final ForgeConfigSpec.BooleanValue GENERATE_ITEM_GROUPS;
     private static final ForgeConfigSpec.BooleanValue GENERATE_BLOCK_STATES;
     private static final ForgeConfigSpec.BooleanValue GENERATE_BLOCKS;
     private static final ForgeConfigSpec.BooleanValue GENERATE_ITEMS;
@@ -65,45 +57,47 @@ public final class Config {
     private static final ForgeConfigSpec.BooleanValue GENERATE_ENCHANTMENTS;
     private static final ForgeConfigSpec.BooleanValue GENERATE_COMPOSTING;
     private static final ForgeConfigSpec.IntValue DEFAULT_ENCHANTMENT_VALUE;
-    private static final ConfigHelper.ConfigObject<Map<String, ResourceLocation>> ITEM_GROUP;
-    private static final ConfigHelper.ConfigObject<Map<String, Boolean>> ITEM_GROUP_SEARCH;
-    private static final ConfigHelper.ConfigObject<Map<String, ResourceLocation>> ITEM_GROUP_BACKGROUND;
-    private static final ConfigHelper.ConfigObject<Map<String, List<String>>> ITEM_GROUP_ENCHANTMENTS;
+/*
+    private static final ConfigObject<Map<String, ResourceLocation>> ITEM_GROUP;
+    private static final ConfigObject<Map<String, Boolean>> ITEM_GROUP_SEARCH;
+    private static final ConfigObject<Map<String, ResourceLocation>> ITEM_GROUP_BACKGROUND;
+    private static final ConfigObject<Map<String, List<String>>> ITEM_GROUP_ENCHANTMENTS;
     private static final ForgeConfigSpec.BooleanValue REMOVE_EMPTY_ITEM_GROUPS;
     private static final ForgeConfigSpec.BooleanValue SORT_ITEM_GROUPS;
     private static final ForgeConfigSpec.ConfigValue<List<String>> FORCE_REMOVE_ITEM_GROUPS;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> DESTROY_TIME;
-    private static final ConfigHelper.ConfigObject<Map<String, Boolean>> REQUIRES_TOOL;
-    private static final ConfigHelper.ConfigObject<Map<String, Integer>> LIGHT_EMISSION;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> EXPLOSION_RESISTANCE;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> FRICTION;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> SPEED_FACTOR;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> JUMP_FACTOR;
-    private static final ConfigHelper.ConfigObject<Map<String, Integer>> MAX_DAMAGE;
-    private static final ConfigHelper.ConfigObject<Map<String, Integer>> MAX_STACK_SIZE;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> GROUP;
-    private static final ConfigHelper.ConfigObject<Map<String, Boolean>> FIRE_RESISTANT;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> RARITY;
-    private static final ConfigHelper.ConfigObject<Map<String, Integer>> ENCHANTMENT_VALUE;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> REPAIR_MATERIAL;
-    private static final ConfigHelper.ConfigObject<Map<String, Integer>> DEFENSE;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> TOUGHNESS;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> KNOCKBACK_RESISTANCE;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> EFFICIENCY;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> ATTACK_DAMAGE;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> ATTACK_SPEED;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> ENCHANTMENT_RARITY;
+*/
+    private static final ConfigObject<Map<String, Float>> DESTROY_TIME;
+    private static final ConfigObject<Map<String, Boolean>> REQUIRES_TOOL;
+    private static final ConfigObject<Map<String, Integer>> LIGHT_EMISSION;
+    private static final ConfigObject<Map<String, Float>> EXPLOSION_RESISTANCE;
+    private static final ConfigObject<Map<String, Float>> FRICTION;
+    private static final ConfigObject<Map<String, Float>> SPEED_FACTOR;
+    private static final ConfigObject<Map<String, Float>> JUMP_FACTOR;
+    private static final ConfigObject<Map<String, Integer>> MAX_DAMAGE;
+    private static final ConfigObject<Map<String, Integer>> MAX_STACK_SIZE;
+//    private static final ConfigObject<Map<String, String>> GROUP;
+    private static final ConfigObject<Map<String, Boolean>> FIRE_RESISTANT;
+    private static final ConfigObject<Map<String, String>> RARITY;
+    private static final ConfigObject<Map<String, Integer>> ENCHANTMENT_VALUE;
+    private static final ConfigObject<Map<String, String>> REPAIR_MATERIAL;
+    private static final ConfigObject<Map<String, Integer>> DEFENSE;
+    private static final ConfigObject<Map<String, Float>> TOUGHNESS;
+    private static final ConfigObject<Map<String, Float>> KNOCKBACK_RESISTANCE;
+    private static final ConfigObject<Map<String, Float>> EFFICIENCY;
+    private static final ConfigObject<Map<String, Float>> ATTACK_DAMAGE;
+    private static final ConfigObject<Map<String, Float>> ATTACK_SPEED;
+    private static final ConfigObject<Map<String, String>> ENCHANTMENT_RARITY;
     private static final ForgeConfigSpec.BooleanValue CLEAR_COMPOSTING;
-    private static final ConfigHelper.ConfigObject<Map<String, Float>> COMPOSTING;
+    private static final ConfigObject<Map<String, Float>> COMPOSTING;
     static final ForgeConfigSpec.BooleanValue CLEAR_STRIPPING;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> STRIPPING;
+    private static final ConfigObject<Map<String, String>> STRIPPING;
     static final ForgeConfigSpec.BooleanValue CLEAR_FLATTENING;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> FLATTENING;
+    private static final ConfigObject<Map<String, String>> FLATTENING;
     static final ForgeConfigSpec.BooleanValue CLEAR_TILLING;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> TILLING;
-    private static final ConfigHelper.ConfigObject<Map<String, Boolean>> TILLING_NEEDS_AIR;
-    private static final ConfigHelper.ConfigObject<Map<String, ResourceLocation>> TILLING_ITEM_DROP;
-    private static final ConfigHelper.ConfigObject<Map<String, String>> ATTRIBUTES;
+    private static final ConfigObject<Map<String, String>> TILLING;
+    private static final ConfigObject<Map<String, Boolean>> TILLING_NEEDS_AIR;
+    private static final ConfigObject<Map<String, ResourceLocation>> TILLING_ITEM_DROP;
+    private static final ConfigObject<Map<String, String>> ATTRIBUTES;
     public static Map<BlockState, Float> DESTROY_TIME_STATES = new HashMap<>();
     public static Map<BlockState, Boolean> REQUIRES_TOOL_STATES = new HashMap<>();
     public static Map<BlockState, Integer> LIGHT_EMISSION_STATES = new HashMap<>();
@@ -127,7 +121,7 @@ public final class Config {
         LOG_ERRORS = builder.comment("Whether to log failed operations or not.").define("log_errors", true);
         builder.pop();
         builder.comment("Generates a config with all non-default values in " + PropertyModifier.MOD_ID + "-generated.toml.").push("generating");
-        GENERATE_ITEM_GROUPS = builder.comment("Generates item group-related entries.").define("item_groups", false);
+//        GENERATE_ITEM_GROUPS = builder.comment("Generates item group-related entries.").define("item_groups", false);
         GENERATE_BLOCK_STATES = builder.comment("Generates block state-related entries.").define("block_states", false);
         GENERATE_BLOCKS = builder.comment("Generates block-related entries.").define("blocks", false);
         GENERATE_ITEMS = builder.comment("Generates item-related entries.").define("items", false);
@@ -137,73 +131,76 @@ public final class Config {
         GENERATE_COMPOSTING = builder.comment("Generates composting-related entries.").define("composting", false);
         DEFAULT_ENCHANTMENT_VALUE = builder.comment("The default enchantment value used. 0 in vanilla, but mods such as Apotheosis may change this.").defineInRange("default_enchantment_value", 0, 0, 1000000);
         builder.pop();
+/*
         builder.comment("The test values are needed because the library Forge uses for configs has a bug that doesn't allow empty default config values. If you add a value to a category, you can safely remove the test value.", "", "Set the respective values here by adding lines in the respective groups. If you want to create entirely new item groups, set an icon for a group name that doesn't exist yet. The tab \"missingno\" is provided by this mod, any items in it are removed after running everything else.").push("item_groups");
-        ITEM_GROUP = ConfigHelper.define(builder.comment("Set an icon for a creative tab. Must be a valid item id. Example (without the leading #):", "test = \"minecraft:nether_star\""), "icon", Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), Map.of("test", new ResourceLocation("missingno")));
-        ITEM_GROUP_SEARCH = ConfigHelper.define(builder.comment("Set whether item groups should have a search bar or not. Must be true or false. Only works for tabs created by this mod. Example (without the leading #):", "test = true"), "search", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
-        ITEM_GROUP_BACKGROUND = ConfigHelper.define(builder.comment("Set an alternative background for an item group. Must be a valid resource location. Example (without the leading #):", "minecraft:textures/gui/container/creative_inventory/tab_inventory.png"), "background", Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), Map.of("test", new ResourceLocation("missingno")));
-        ITEM_GROUP_ENCHANTMENTS = ConfigHelper.define(builder.comment("Set the enchantment categories for an item group. Must be a list of valid enchantment category names. Use [] for no enchantment groups (this is the default for newly-created groups). Example (without the leading #):", "[\"vanishable\", \"breakable\", \"digger\"]", "Default enchantment groups (mods may add more!): \"armor\", \"armor_feet\", \"armor_legs\", \"armor_chest\", \"armor_head\", \"weapon\", \"digger\", \"fishing_rod\", \"trident\", \"breakable\", \"bow\", \"wearable\", \"crossbow\", \"vanishable\""), "enchantments", Codec.unboundedMap(Codec.STRING, Codec.list(Codec.STRING)), Map.of("test", new ArrayList<>()));
+        ITEM_GROUP = ConfigObject.define(builder.comment("Set an icon for a creative tab. Must be a valid item id. Example (without the leading #):", "test = \"minecraft:nether_star\""), "icon", Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), Map.of("test", new ResourceLocation("missingno")));
+        ITEM_GROUP_SEARCH = ConfigObject.define(builder.comment("Set whether item groups should have a search bar or not. Must be true or false. Only works for tabs created by this mod. Example (without the leading #):", "test = true"), "search", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
+        ITEM_GROUP_BACKGROUND = ConfigObject.define(builder.comment("Set an alternative background for an item group. Must be a valid resource location. Example (without the leading #):", "minecraft:textures/gui/container/creative_inventory/tab_inventory.png"), "background", Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), Map.of("test", new ResourceLocation("missingno")));
+        ITEM_GROUP_ENCHANTMENTS = ConfigObject.define(builder.comment("Set the enchantment categories for an item group. Must be a list of valid enchantment category names. Use [] for no enchantment groups (this is the default for newly-created groups). Example (without the leading #):", "[\"vanishable\", \"breakable\", \"digger\"]", "Default enchantment groups (mods may add more!): \"armor\", \"armor_feet\", \"armor_legs\", \"armor_chest\", \"armor_head\", \"weapon\", \"digger\", \"fishing_rod\", \"trident\", \"breakable\", \"bow\", \"wearable\", \"crossbow\", \"vanishable\""), "enchantments", Codec.unboundedMap(Codec.STRING, Codec.list(Codec.STRING)), Map.of("test", new ArrayList<>()));
         REMOVE_EMPTY_ITEM_GROUPS = builder.comment("Whether to remove empty item groups or not.").define("remove_empty", true);
         SORT_ITEM_GROUPS = builder.comment("Whether to sort all item groups or not.").define("sort", false);
         FORCE_REMOVE_ITEM_GROUPS = builder.comment("A list of groups that should be removed under all circumstances. Cannot remove \"hotbar\", \"search\" and \"inventory\".").define("force_remove", new ArrayList<>());
         builder.pop();
+*/
         builder.comment("Set the respective values here by adding lines in the respective groups. Keys can be either a block (e.g. \"minecraft:stripped_birch_wood\"), a block regex (e.g. \"minecraft:.*_block\") or a blockstate definition (e.g. \"minecraft:grass_block[snowy=true]\"). Block regexes cannot contain the [] characters, as their presence will be interpreted as a blockstate definition instead.").push("blocks_and_blockstates");
-        DESTROY_TIME = ConfigHelper.define(builder.comment("Set the destroy time for a block (state). Dirt has 0.5, stone has 1.5, obsidian has 50. -1 makes the block unbreakable. Examples (without the leading #):", "\"minecraft:grass_block[snowy=true]\" = 100", "\"minecraft:.*_planks\" = 100"), "destroy_time", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        REQUIRES_TOOL = ConfigHelper.define(builder.comment("Set the tool requirement of a block (state). Must be true or false. Examples (without the leading #):", "\"minecraft:diamond_ore\" = false", "\"minecraft:oak_log\" = true"), "requires_tool", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
-        LIGHT_EMISSION = ConfigHelper.define(builder.comment("Set the light emission of a block (state). Must be an integer between 0 and 15. Examples (without the leading #):", "\"minecraft:redstone_torch[lit=true]\" = 15", "\"minecraft:.*_bricks\" = 7"), "light_emission", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
+        DESTROY_TIME = ConfigObject.of(builder.comment("Set the destroy time for a block (state). Dirt has 0.5, stone has 1.5, obsidian has 50. -1 makes the block unbreakable. Examples (without the leading #):", "\"minecraft:grass_block[snowy=true]\" = 100", "\"minecraft:.*_planks\" = 100"), "destroy_time", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        REQUIRES_TOOL = ConfigObject.of(builder.comment("Set the tool requirement of a block (state). Must be true or false. Examples (without the leading #):", "\"minecraft:diamond_ore\" = false", "\"minecraft:oak_log\" = true"), "requires_tool", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
+        LIGHT_EMISSION = ConfigObject.of(builder.comment("Set the light emission of a block (state). Must be an integer between 0 and 15. Examples (without the leading #):", "\"minecraft:redstone_torch[lit=true]\" = 15", "\"minecraft:.*_bricks\" = 7"), "light_emission", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
         builder.pop();
         builder.comment("Set the respective values here by adding lines in the respective groups. Keys can be either a block (e.g. \"minecraft:stripped_birch_wood\") or a block regex (e.g. \"minecraft:.*_block\").").push("blocks");
-        EXPLOSION_RESISTANCE = ConfigHelper.define(builder.comment("Set the explosion resistance for a block. Dirt has 0.5, stone and has 6, obsidian has 1200. 3600000 or more makes the block completely explosion resistant. Example (without the leading #):", "\"minecraft:dirt\" = 1000"), "explosion_resistance", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        FRICTION = ConfigHelper.define(builder.comment("Set the friction for a block. 0.6 for most blocks, 0.8 for slime blocks, 0.98 for ice, packed ice and frosted ice, and 0.989 for blue ice. Example (without the leading #):", "\"minecraft:.*ice\" = 0.6"), "friction", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        SPEED_FACTOR = ConfigHelper.define(builder.comment("Set the speed factor for a block. 1 for most blocks, 0.4 for soul sand and honey blocks. Example (without the leading #):", "\"minecraft:soul_sand\" = 1"), "speed_factor", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        JUMP_FACTOR = ConfigHelper.define(builder.comment("Set the speed factor for a block. 1 for most blocks, 0.5 for honey blocks. Example (without the leading #):", "\"minecraft:honey_block\" = 1"), "jump_factor", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        EXPLOSION_RESISTANCE = ConfigObject.of(builder.comment("Set the explosion resistance for a block. Dirt has 0.5, stone and has 6, obsidian has 1200. 3600000 or more makes the block completely explosion resistant. Example (without the leading #):", "\"minecraft:dirt\" = 1000"), "explosion_resistance", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        FRICTION = ConfigObject.of(builder.comment("Set the friction for a block. 0.6 for most blocks, 0.8 for slime blocks, 0.98 for ice, packed ice and frosted ice, and 0.989 for blue ice. Example (without the leading #):", "\"minecraft:.*ice\" = 0.6"), "friction", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        SPEED_FACTOR = ConfigObject.of(builder.comment("Set the speed factor for a block. 1 for most blocks, 0.4 for soul sand and honey blocks. Example (without the leading #):", "\"minecraft:soul_sand\" = 1"), "speed_factor", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        JUMP_FACTOR = ConfigObject.of(builder.comment("Set the speed factor for a block. 1 for most blocks, 0.5 for honey blocks. Example (without the leading #):", "\"minecraft:honey_block\" = 1"), "jump_factor", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
         builder.pop();
         builder.comment("Set the respective values here by adding lines in the respective groups. Keys can be either an item (e.g. \"minecraft:stripped_birch_wood\") or an item regex (e.g. \"minecraft:diamond.*\").").push("items");
-        MAX_DAMAGE = ConfigHelper.define(builder.comment("Set the max damage (durability) of an item. Only items that already have durability can have this value altered. Example (without the leading #):", "\"minecraft:diamond_.*\" = 5000"), "max_damage", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
-        MAX_STACK_SIZE = ConfigHelper.define(builder.comment("Set the max stack size of an item. Only values between 2 and 64 are supported. Items that have durability cannot have this value altered. Example (without the leading #):", "\"minecraft:ender_pearl\" = 64"), "max_stack_size", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
-        GROUP = ConfigHelper.define(builder.comment("Set the item group (creative tab) of an item. Use \"missingno\" to remove the item from any item groups. Example (without the leading #):", "\"minecraft:command_block\" = \"decorations\""), "group", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
-        FIRE_RESISTANT = ConfigHelper.define(builder.comment("Set this value to true to make an item fire resistant (like netherite is), or set it to false to make it burn in fire and lava. Example (without the leading #):", "\"minecraft:netherite_ingot\" = false"), "fire_resistant", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
-        RARITY = ConfigHelper.define(builder.comment("Set the rarity (item color) of an item. Must be a valid rarity name. Example (without the leading #):", "\"minecraft:beacon\" = \"common\"", "Default rarities (mods may add more!): \"common\", \"uncommon\", \"rare\", \"epic\""), "rarity", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
-        ENCHANTMENT_VALUE = ConfigHelper.define(builder.comment("Set the enchantment value of an item. Higher value means better enchantments on average. May not always have a noticeable effect. Example (without the leading #):", "\"minecraft:.*_hoe\" = 40"), "enchantment_value", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
-        REPAIR_MATERIAL = ConfigHelper.define(builder.comment("Set the repair material of an item. May be an item or a tag containing multiple items, with a # before the tag id. Example (without the leading #):", "\"minecraft:wooden_.*\" = \"#minecraft:fishes\""), "repair_material", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        MAX_DAMAGE = ConfigObject.of(builder.comment("Set the max damage (durability) of an item. Only items that already have durability can have this value altered. Example (without the leading #):", "\"minecraft:diamond_.*\" = 5000"), "max_damage", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
+        MAX_STACK_SIZE = ConfigObject.of(builder.comment("Set the max stack size of an item. Only values between 2 and 64 are supported. Items that have durability cannot have this value altered. Example (without the leading #):", "\"minecraft:ender_pearl\" = 64"), "max_stack_size", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
+//        GROUP = ConfigObject.define(builder.comment("Set the item group (creative tab) of an item. Use \"missingno\" to remove the item from any item groups. Example (without the leading #):", "\"minecraft:command_block\" = \"decorations\""), "group", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        FIRE_RESISTANT = ConfigObject.of(builder.comment("Set this value to true to make an item fire resistant (like netherite is), or set it to false to make it burn in fire and lava. Example (without the leading #):", "\"minecraft:netherite_ingot\" = false"), "fire_resistant", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
+        RARITY = ConfigObject.of(builder.comment("Set the rarity (item color) of an item. Must be a valid rarity name. Example (without the leading #):", "\"minecraft:beacon\" = \"common\"", "Default rarities (mods may add more!): \"common\", \"uncommon\", \"rare\", \"epic\""), "rarity", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        ENCHANTMENT_VALUE = ConfigObject.of(builder.comment("Set the enchantment value of an item. Higher value means better enchantments on average. May not always have a noticeable effect. Example (without the leading #):", "\"minecraft:.*_hoe\" = 40"), "enchantment_value", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
+        REPAIR_MATERIAL = ConfigObject.of(builder.comment("Set the repair material of an item. May be an item or a tag containing multiple items, with a # before the tag id. Example (without the leading #):", "\"minecraft:wooden_.*\" = \"#minecraft:fishes\""), "repair_material", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
         builder.comment("Set the values for armor.").push("armor");
-        DEFENSE = ConfigHelper.define(builder.comment("Set the defense value of an armor item. May not work on modded armors, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:golden_chestplate\" = 10"), "defense", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
-        TOUGHNESS = ConfigHelper.define(builder.comment("Set the toughness value of an armor item. May not work on modded armors, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:golden_boots\" = 1"), "toughness", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        KNOCKBACK_RESISTANCE = ConfigHelper.define(builder.comment("Set the knockback resistance of an armor item. May not work on modded armors, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:golden_leggings\" = 0.1"), "knockback_resistance", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        DEFENSE = ConfigObject.of(builder.comment("Set the defense value of an armor item. May not work on modded armors, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:golden_chestplate\" = 10"), "defense", Codec.unboundedMap(Codec.STRING, Codec.INT), Map.of("test", 0));
+        TOUGHNESS = ConfigObject.of(builder.comment("Set the toughness value of an armor item. May not work on modded armors, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:golden_boots\" = 1"), "toughness", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        KNOCKBACK_RESISTANCE = ConfigObject.of(builder.comment("Set the knockback resistance of an armor item. May not work on modded armors, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:golden_leggings\" = 0.1"), "knockback_resistance", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
         builder.pop();
         builder.comment("Set the values for tools, swords and tridents.").push("tools");
-        EFFICIENCY = ConfigHelper.define(builder.comment("Set the efficiency value of a tool. May not work on modded tools, please file an issue if that's the case. Also doesn't work on shears, due to internal problems with that. Example (without the leading #):", "\"minecraft:iron_pickaxe\" = 16"), "efficiency", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        ATTACK_DAMAGE = ConfigHelper.define(builder.comment("Set the attack damage of a tool or weapon. May not work on modded tools, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:netherite_sword\" = 12"), "attack_damage", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
-        ATTACK_SPEED = ConfigHelper.define(builder.comment("Set the attack speed of a tool or weapon. May not work on modded tools, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:netherite_pickaxe\" = 2.5"), "attack_speed", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        EFFICIENCY = ConfigObject.of(builder.comment("Set the efficiency value of a tool. May not work on modded tools, please file an issue if that's the case. Also doesn't work on shears, due to internal problems with that. Example (without the leading #):", "\"minecraft:iron_pickaxe\" = 16"), "efficiency", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        ATTACK_DAMAGE = ConfigObject.of(builder.comment("Set the attack damage of a tool or weapon. May not work on modded tools, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:netherite_sword\" = 12"), "attack_damage", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        ATTACK_SPEED = ConfigObject.of(builder.comment("Set the attack speed of a tool or weapon. May not work on modded tools, please file an issue if that's the case. Example (without the leading #):", "\"minecraft:netherite_pickaxe\" = 2.5"), "attack_speed", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
         builder.pop();
         builder.pop();
         builder.comment("Set the values for enchantments.").push("enchantments");
-        ENCHANTMENT_RARITY = ConfigHelper.define(builder.comment("Set the rarity of an enchantment. Must be a valid rarity name. Example (without the leading #):", "\"minecraft:mending\" = \"common\"", "Default rarities (mods may add more!): \"common\", \"uncommon\", \"rare\", \"very_rare\""), "rarity", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        ENCHANTMENT_RARITY = ConfigObject.of(builder.comment("Set the rarity of an enchantment. Must be a valid rarity name. Example (without the leading #):", "\"minecraft:mending\" = \"common\"", "Default rarities (mods may add more!): \"common\", \"uncommon\", \"rare\", \"very_rare\""), "rarity", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
         builder.pop();
         builder.comment("Add or remove compostables.").push("composting");
         CLEAR_COMPOSTING = builder.comment("Whether to remove all predefined compostables or not.").define("clear", false);
-        COMPOSTING = ConfigHelper.define(builder.comment("Add new compostables here. Consists of an item or item regex and a float between 0 and 1, representing the chance that the composter level is increased. Example (without the leading #):", "\"minecraft:netherite_scrap\" = 0.8"), "composting", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
+        COMPOSTING = ConfigObject.of(builder.comment("Add new compostables here. Consists of an item or item regex and a float between 0 and 1, representing the chance that the composter level is increased. Example (without the leading #):", "\"minecraft:netherite_scrap\" = 0.8"), "composting", Codec.unboundedMap(Codec.STRING, Codec.FLOAT), Map.of("test", 0f));
         builder.pop();
         builder.comment("Set the values for axe stripping.").push("stripping");
         CLEAR_STRIPPING = builder.comment("Whether to remove all predefined stripping values or not.").define("clear", false);
-        STRIPPING = ConfigHelper.define(builder.comment("Add new stripping transitions here. Consists of a block or block regex and a block or block state, representing the output. Example (without the leading #):", "\"minecraft:.*_planks\" = \"minecraft:infested_cobblestone\""), "stripping", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        STRIPPING = ConfigObject.of(builder.comment("Add new stripping transitions here. Consists of a block or block regex and a block or block state, representing the output. Example (without the leading #):", "\"minecraft:.*_planks\" = \"minecraft:infested_cobblestone\""), "stripping", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
         builder.pop();
         builder.comment("Set the values for shovel flattening.").push("flattening");
         CLEAR_FLATTENING = builder.comment("Whether to remove all predefined flattening values or not.").define("clear", false);
-        FLATTENING = ConfigHelper.define(builder.comment("Add new flattening transitions here. Consists of a block or block regex and a block or block state, representing the output. Example (without the leading #):", "\"minecraft:.*_planks\" = \"minecraft:infested_cobblestone\""), "flattening", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        FLATTENING = ConfigObject.of(builder.comment("Add new flattening transitions here. Consists of a block or block regex and a block or block state, representing the output. Example (without the leading #):", "\"minecraft:.*_planks\" = \"minecraft:infested_cobblestone\""), "flattening", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
         builder.pop();
         builder.comment("Set the values for hoe tilling.").push("tilling");
         CLEAR_TILLING = builder.comment("Whether to remove all predefined tilling values or not.").define("clear", false);
-        TILLING = ConfigHelper.define(builder.comment("Add new tilling transitions here. Consists of a block or block regex and a block or block state, representing the output. Example (without the leading #):", "\"minecraft:diamond_block\" = \"minecraft:emerald_block\""), "tilling", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
-        TILLING_NEEDS_AIR = ConfigHelper.define(builder.comment("Whether a certain tilling transition needs air above to work. Consists of a block or block regex and a boolean value (true or false). If left unspecified, true is assumed. Example (without the leading #):", "\"minecraft:diamond_block\" = false"), "needs_air", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
-        TILLING_ITEM_DROP = ConfigHelper.define(builder.comment("The item that is dropped when tilling. Consists of a block or block regex and an item id. If left unspecified, no item is dropped. Example (without the leading #):", "\"minecraft:diamond_block\" = \"minecraft:iron_nugget\""), "item_drop", Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), Map.of("test", new ResourceLocation("missingno")));
+        TILLING = ConfigObject.of(builder.comment("Add new tilling transitions here. Consists of a block or block regex and a block or block state, representing the output. Example (without the leading #):", "\"minecraft:diamond_block\" = \"minecraft:emerald_block\""), "tilling", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        TILLING_NEEDS_AIR = ConfigObject.of(builder.comment("Whether a certain tilling transition needs air above to work. Consists of a block or block regex and a boolean value (true or false). If left unspecified, true is assumed. Example (without the leading #):", "\"minecraft:diamond_block\" = false"), "needs_air", Codec.unboundedMap(Codec.STRING, Codec.BOOL), Map.of("test", false));
+        TILLING_ITEM_DROP = ConfigObject.of(builder.comment("The item that is dropped when tilling. Consists of a block or block regex and an item id. If left unspecified, no item is dropped. Example (without the leading #):", "\"minecraft:diamond_block\" = \"minecraft:iron_nugget\""), "item_drop", Codec.unboundedMap(Codec.STRING, ResourceLocation.CODEC), Map.of("test", new ResourceLocation("missingno")));
         builder.pop();
         builder.comment("Set the values for entities.").push("entities");
-        ATTRIBUTES = ConfigHelper.define(builder.comment("Set the default attributes for entities. Format is \"entityid\" = \"attributeid;value\". Cannot add new attributes to mobs, can only alter those that are present by default anyway. Example (without the leading #):", "\"minecraft:zombie\" = \"minecraft:generic.attack_damage;10\""), "default_attributes", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
+        ATTRIBUTES = ConfigObject.of(builder.comment("Set the default attributes for entities. Format is \"entityid\" = \"attributeid;value\". Cannot add new attributes to mobs, can only alter those that are present by default anyway. Example (without the leading #):", "\"minecraft:zombie\" = \"minecraft:generic.attack_damage;10\""), "default_attributes", Codec.unboundedMap(Codec.STRING, Codec.STRING), Map.of("test", ""));
         builder.pop();
         SPEC = builder.build();
     }
 
     static void read() {
+/*
         Map<String, Pair<Item, Boolean>> tabs = new HashMap<>();
         ITEM_GROUP.get().forEach((k, v) -> tabs.put(k, new Pair<>(ForgeRegistries.ITEMS.getValue(v), false)));
         ITEM_GROUP_SEARCH.get().forEach((k, v) -> {
@@ -233,6 +230,7 @@ public final class Config {
                 return null;
             }
         }).filter(Objects::nonNull).toList().toArray(new EnchantmentCategory[0]))));
+*/
         DESTROY_TIME.get().forEach(parseBlockStatesIntoMap(DESTROY_TIME_STATES, DESTROY_TIME_BLOCKS));
         DESTROY_TIME_STATES.keySet().stream().filter(e -> DESTROY_TIME_STATES.get(e) < -1).forEach(e -> {
             DESTROY_TIME_STATES.remove(e);
@@ -316,6 +314,7 @@ public final class Config {
                 item.maxStackSize = value;
             }
         }
+/*
         Map<Item, CreativeModeTab> group = new HashMap<>();
         GROUP.get().forEach((k, v) -> getItemGroup(v).ifPresent(tab -> ForgeRegistries.ITEMS.getKeys().stream().filter(e -> e.toString().matches(k)).forEach(e -> group.put(ForgeRegistries.ITEMS.getValue(e), tab))));
         group.forEach((k, v) -> k.category = v);
@@ -327,6 +326,7 @@ public final class Config {
                 item.category = null;
             }
         }
+*/
         Map<Item, Boolean> fireResistant = new HashMap<>();
         FIRE_RESISTANT.get().forEach(parseItemsIntoMap(fireResistant));
         fireResistant.forEach((k, v) -> k.isFireResistant = v);
@@ -350,7 +350,7 @@ public final class Config {
                 ENCHANTMENT_VALUES.put(item, value);
             }
         }
-        REPAIR_MATERIAL.get().forEach((k, v) -> ForgeRegistries.ITEMS.getKeys().stream().filter(e -> e.toString().matches(k)).forEach(e -> REPAIR_MATERIALS.put(ForgeRegistries.ITEMS.getValue(e), Lazy.of(() -> v.startsWith("#") ? Ingredient.of(TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(v.substring(1)))) : Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(v)))))));
+        REPAIR_MATERIAL.get().forEach((k, v) -> ForgeRegistries.ITEMS.getKeys().stream().filter(e -> e.toString().matches(k)).forEach(e -> REPAIR_MATERIALS.put(ForgeRegistries.ITEMS.getValue(e), Lazy.of(() -> v.startsWith("#") ? Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(v.substring(1)))) : Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(v)))))));
         Map<ArmorItem, Triple<Integer, Float, Float>> armor = new HashMap<>();
         Map<Item, Integer> defense = new HashMap<>();
         DEFENSE.get().forEach(parseItemsIntoMap(defense));
@@ -498,7 +498,7 @@ public final class Config {
         for (Block block : stripping.keySet()) {
             String value = stripping.get(block);
             try {
-                AXE_STRIPPING.put(block, BlockStateParser.parseForBlock(Registry.BLOCK, value, true).blockState());
+                AXE_STRIPPING.put(block, BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), value, true).blockState());
             } catch (CommandSyntaxException e) {
                 Logger.error("Could not find block state " + value);
             }
@@ -508,7 +508,7 @@ public final class Config {
         for (Block block : flattening.keySet()) {
             String value = flattening.get(block);
             try {
-                SHOVEL_FLATTENING.put(block, BlockStateParser.parseForBlock(Registry.BLOCK, value, true).blockState());
+                SHOVEL_FLATTENING.put(block, BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), value, true).blockState());
             } catch (CommandSyntaxException e) {
                 Logger.error("Could not find block state " + value);
             }
@@ -519,7 +519,7 @@ public final class Config {
             String value = tillingTemp.get(block);
             Triple<BlockState, Boolean, Item> triple = HOE_TILLING.getOrDefault(block, new Triple<>(null, null, null));
             try {
-                triple.a = BlockStateParser.parseForBlock(Registry.BLOCK, value, true).blockState();
+                triple.a = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), value, true).blockState();
                 HOE_TILLING.put(block, triple);
             } catch (CommandSyntaxException e) {
                 Logger.error("Could not find block state " + value);
@@ -571,6 +571,7 @@ public final class Config {
                 Logger.error("Invalid attribute value " + array[1]);
             }
         });
+/*
         List<CreativeModeTab> list = new ArrayList<>();
         List<CreativeModeTab> temp = new ArrayList<>(List.of(CreativeModeTab.TABS));
         temp.remove(CreativeModeTab.TAB_HOTBAR);
@@ -616,6 +617,7 @@ public final class Config {
             list.get(i).id = i;
         }
         CreativeModeTab.TABS = list.toArray(new CreativeModeTab[0]);
+*/
         generate();
     }
 
@@ -625,6 +627,7 @@ public final class Config {
         }
     }
 
+/*
     private static Optional<CreativeModeTab> getItemGroup(String name) {
         Optional<CreativeModeTab> optional = Arrays.stream(CreativeModeTab.TABS).filter(e -> e.getRecipeFolderName().equals(name)).findAny();
         if (optional.isEmpty()) {
@@ -632,6 +635,7 @@ public final class Config {
         }
         return optional;
     }
+*/
 
     /**
      * adapted from {@link net.minecraft.world.level.levelgen.structure.templatesystem.JigsawReplacementProcessor#processBlock}
@@ -640,7 +644,7 @@ public final class Config {
         return (k, v) -> {
             if (k.contains("[")) {
                 try {
-                    stateMap.put(BlockStateParser.parseForBlock(Registry.BLOCK, k, true).blockState(), v);
+                    stateMap.put(BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), k, true).blockState(), v);
                 } catch (CommandSyntaxException e) {
                     Logger.error("Could not find block state " + k + " mentioned in entry \"" + k + "\" = " + v);
                 }
@@ -696,6 +700,7 @@ public final class Config {
 
     private static void generate() {
         StringBuilder builder = new StringBuilder("# This config file is for getting default values, for use in " + PropertyModifier.MOD_ID + "-common.toml. It is NOT directly usable!\n");
+/*
         if (GENERATE_ITEM_GROUPS.get()) {
             builder.append("[item_groups]\n");
             builder.append("    [item_groups.icon]\n");
@@ -732,6 +737,7 @@ public final class Config {
                 }
             }
         }
+*/
         if (GENERATE_BLOCK_STATES.get()) {
             builder.append("# Note: For blocks with multiple states, only the value of the default state is listed.\n[blocks_and_blockstates]\n");
             builder.append("    # If not listed, the value for a block is 0.\n    [blocks_and_blockstates.destroy_time]\n");
@@ -803,6 +809,7 @@ public final class Config {
                     builder.append("        \"").append(ForgeRegistries.ITEMS.getKey(item)).append("\" = ").append(maxStackSize).append("\n");
                 }
             }
+/*
             builder.append("    # If not listed, the value for an item is \"missingno\".\n    [items.group]\n");
             for (Item item : ForgeRegistries.ITEMS.getValues()) {
                 CreativeModeTab category = item.getItemCategory();
@@ -810,6 +817,7 @@ public final class Config {
                     builder.append("        \"").append(ForgeRegistries.ITEMS.getKey(item)).append("\" = \"").append(category.getRecipeFolderName()).append("\"\n");
                 }
             }
+*/
             builder.append("    # If not listed, the value for an item is false.\n    [items.fire_resistant]\n");
             for (Item item : ForgeRegistries.ITEMS.getValues()) {
                 boolean fireResistant = item.isFireResistant();
