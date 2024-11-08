@@ -113,7 +113,7 @@ public record BlocksConfig(
     }
 
     private static <T> void processBlock(String configName, Map<String, T> configValue, BiConsumer<Block, T> consumer) {
-        ConfigHelper.processConfigMap(configValue, BuiltInRegistries.BLOCK, consumer, key -> "Key " + key + " for " + configName + " in blocks.json did not match any blocks");
+        ConfigHelper.processConfigMap(configValue, BuiltInRegistries.BLOCK, consumer, key -> "Key " + key + " for " + configName + " in blocks.json5 did not match any blocks");
     }
 
     private static <T> void processBlockState(String configName, Map<String, T> configValue, BiConsumer<BlockState, T> consumer) {
@@ -129,7 +129,7 @@ public record BlocksConfig(
             ConfigHelper.resolveBlockStatesRegex(key)
                     .forEach(state -> temp.put(state, value));
             if (temp.isEmpty()) {
-                PropertyModifier.LOGGER.warn("Key {} for {} in blocks.json did not match any blocks", configName, configName);
+                PropertyModifier.LOGGER.error("Key {} for {} in blocks.json5 did not match any blocks", configName, configName);
             }
             blockStates.putAll(temp);
         }

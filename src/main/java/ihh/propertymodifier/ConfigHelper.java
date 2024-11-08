@@ -20,11 +20,11 @@ import java.util.function.Function;
 
 public final class ConfigHelper {
     public static <T> JsonElement encodeJson(MapCodec<T> codec, T input) {
-        return codec.codec().encodeStart(JanksonOps.COMMENTED, input).getOrThrow();
+        return codec.codec().encodeStart(JanksonOps.COMMENTED, input).getOrThrow(ConfigException::new);
     }
 
     public static <T> T decodeJson(MapCodec<T> codec, JsonElement input) {
-        return codec.codec().decode(JanksonOps.COMMENTED, input).map(Pair::getFirst).getOrThrow();
+        return codec.codec().decode(JanksonOps.COMMENTED, input).map(Pair::getFirst).getOrThrow(ConfigException::new);
     }
 
     public static <T> UnboundedMapCodec<String, T> codecStringMap(Codec<T> codec) {
@@ -41,7 +41,7 @@ public final class ConfigHelper {
             T value = entry.getValue();
             List<R> list = registryGetter.apply(key);
             if (list.isEmpty() && emptyListMessage != null) {
-                PropertyModifier.LOGGER.warn(emptyListMessage.apply(key));
+                PropertyModifier.LOGGER.error(emptyListMessage.apply(key));
             }
             for (R r : list) {
                 consumer.accept(r, value);

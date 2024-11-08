@@ -1,6 +1,9 @@
 package ihh.propertymodifier;
 
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,19 +13,24 @@ import java.util.List;
 import java.util.Map;
 
 public final class ConfigResults {
-    public static final Map<Block,      Float>                  EXPLOSION_RESISTANCE = new HashMap<>();
-    public static final Map<Block,      Float>                  FRICTION = new HashMap<>();
-    public static final Map<Block,      Float>                  JUMP_FACTOR = new HashMap<>();
-    public static final Map<Block,      Float>                  SPEED_FACTOR = new HashMap<>();
-    public static final Map<Block,      Boolean>                HAS_COLLISION = new HashMap<>();
-    public static final Map<Block,      Boolean>                IS_RANDOMLY_TICKING = new HashMap<>();
-    public static final Map<BlockState, Integer>                LIGHT_LEVEL = new HashMap<>();
-    public static final Map<BlockState, Float>                  DESTROY_TIME = new HashMap<>();
-    public static final Map<BlockState, Boolean>                IGNITED_BY_LAVA = new HashMap<>();
-    public static final Map<BlockState, Boolean>                REQUIRES_CORRECT_TOOL_FOR_DROPS = new HashMap<>();
-    public static final Map<Item,       List<DataComponentMap>> DEFAULT_COMPONENTS = new HashMap<>();
-    public static final Map<Item,       Item>                   CRAFTING_REMAINDERS = new HashMap<>();
+    public static final Map<Block, Float>   EXPLOSION_RESISTANCE = new HashMap<>();
+    public static final Map<Block, Float>   FRICTION             = new HashMap<>();
+    public static final Map<Block, Float>   JUMP_FACTOR          = new HashMap<>();
+    public static final Map<Block, Float>   SPEED_FACTOR         = new HashMap<>();
+    public static final Map<Block, Boolean> HAS_COLLISION        = new HashMap<>();
+    public static final Map<Block, Boolean> IS_RANDOMLY_TICKING  = new HashMap<>();
 
+    public static final Map<BlockState, Integer> LIGHT_LEVEL                     = new HashMap<>();
+    public static final Map<BlockState, Float>   DESTROY_TIME                    = new HashMap<>();
+    public static final Map<BlockState, Boolean> IGNITED_BY_LAVA                 = new HashMap<>();
+    public static final Map<BlockState, Boolean> REQUIRES_CORRECT_TOOL_FOR_DROPS = new HashMap<>();
+
+    public static final Map<Item, List<DataComponentMap>> DEFAULT_COMPONENTS  = new HashMap<>();
+    public static final Map<Item, Item>                   CRAFTING_REMAINDERS = new HashMap<>();
+
+    public static final Map<EntityType<? extends LivingEntity>, Map<Attribute, Float>> ATTRIBUTE_BASE_VALUES = new HashMap<>();
+
+    @SuppressWarnings("deprecation")
     public static void apply() {
         EXPLOSION_RESISTANCE.forEach((block, f) -> {
             block.explosionResistance = f;

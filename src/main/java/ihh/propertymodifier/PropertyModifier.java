@@ -7,8 +7,8 @@ import net.minecraft.core.component.DataComponentMap;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -20,11 +20,12 @@ public final class PropertyModifier {
     public static final Jankson JANKSON = new Jankson.Builder().build();
 
     public PropertyModifier(IEventBus bus) {
-        bus.addListener(EventPriority.LOWEST, FMLCommonSetupEvent.class, PropertyModifier::commonSetup);
+        bus.addListener(EventPriority.LOWEST, EntityAttributeModificationEvent.class, PropertyModifier::entityAttributeModification);
         bus.addListener(EventPriority.LOWEST, ModifyDefaultComponentsEvent.class, PropertyModifier::modifyDefaultComponents);
     }
 
-    private static void commonSetup(FMLCommonSetupEvent event) {
+    // This is the only correct time we can populate the config at. Yes, I know it is cursed.
+    private static void entityAttributeModification(EntityAttributeModificationEvent event) {
         try {
             ConfigBootstrap.init();
             ConfigResults.apply();

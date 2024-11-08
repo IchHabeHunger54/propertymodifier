@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "ihh.propertymodifier.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "propertymodifier.refmap.json",
+  "mixins": [
+    "MixinCommonHooks"
+  ],
+  "minVersion": "0.8"
+}

@@ -40,6 +40,6 @@ public record ItemsConfig(
     }
 
     private static <T> void process(String configName, Map<String, T> configValue, BiConsumer<Item, T> consumer) {
-        ConfigHelper.processConfigMap(configValue, BuiltInRegistries.ITEM, consumer, key -> "Key " + key + " for " + configName + " in items.json did not match any items");
+        ConfigHelper.processConfigMap(configValue, BuiltInRegistries.ITEM, consumer, key -> "Key " + key + " for " + configName + " in items.json5 did not match any items");
     }
 }
