@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -35,7 +36,11 @@ public record ItemsConfig(
     public static final ItemsConfig DEFAULT = new ItemsConfig(Map.of(), Map.of());
 
     public void process() {
-        process("default_components",  defaultComponents(),  (item, value) -> ConfigResults.DEFAULT_COMPONENTS.getOrDefault(item, new ArrayList<>()).add(value));
+        process("default_components",  defaultComponents(),  (item, value) -> {
+            List<DataComponentMap> list = ConfigResults.DEFAULT_COMPONENTS.getOrDefault(item, new ArrayList<>());
+            list.add(value);
+            ConfigResults.DEFAULT_COMPONENTS.put(item, list);
+        });
         process("crafting_remainders", craftingRemainders(), ConfigResults.CRAFTING_REMAINDERS::put);
     }
 

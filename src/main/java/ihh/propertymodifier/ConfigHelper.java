@@ -19,12 +19,20 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public final class ConfigHelper {
+    public static <T> JsonElement encodeJson(Codec<T> codec, T input) {
+        return codec.encodeStart(JanksonOps.COMMENTED, input).getOrThrow(ConfigException::new);
+    }
+
+    public static <T> T decodeJson(Codec<T> codec, JsonElement input) {
+        return codec.decode(JanksonOps.COMMENTED, input).map(Pair::getFirst).getOrThrow(ConfigException::new);
+    }
+
     public static <T> JsonElement encodeJson(MapCodec<T> codec, T input) {
-        return codec.codec().encodeStart(JanksonOps.COMMENTED, input).getOrThrow(ConfigException::new);
+        return encodeJson(codec.codec(), input);
     }
 
     public static <T> T decodeJson(MapCodec<T> codec, JsonElement input) {
-        return codec.codec().decode(JanksonOps.COMMENTED, input).map(Pair::getFirst).getOrThrow(ConfigException::new);
+        return decodeJson(codec.codec(), input);
     }
 
     public static <T> UnboundedMapCodec<String, T> codecStringMap(Codec<T> codec) {

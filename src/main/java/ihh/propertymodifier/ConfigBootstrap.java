@@ -5,6 +5,7 @@ import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.api.SyntaxError;
 import com.mojang.serialization.MapCodec;
 import ihh.propertymodifier.config.BlocksConfig;
+import ihh.propertymodifier.config.CoreConfig;
 import ihh.propertymodifier.config.EntitiesConfig;
 import ihh.propertymodifier.config.ItemsConfig;
 import net.neoforged.fml.loading.FMLPaths;
@@ -23,6 +24,7 @@ public final class ConfigBootstrap {
         ConfigHolder.add("blocks",   BlocksConfig.CODEC,   BlocksConfig.DEFAULT,   BlocksConfig::process);
         ConfigHolder.add("items",    ItemsConfig.CODEC,    ItemsConfig.DEFAULT,    ItemsConfig::process);
         ConfigHolder.add("entities", EntitiesConfig.CODEC, EntitiesConfig.DEFAULT, EntitiesConfig::process);
+        ConfigHolder.add("core",     CoreConfig.CODEC,     CoreConfig.DEFAULT,     CoreConfig::process);
 
         Path directory = FMLPaths.CONFIGDIR.get().resolve(PropertyModifier.MOD_ID);
         if (!Files.exists(directory)) {
@@ -34,12 +36,12 @@ public final class ConfigBootstrap {
             if (!Files.exists(path)) {
                 value = config.defaultValue();
                 Files.createFile(path);
-                Files.writeString(path, config.encodeJsonDefault().toString());
+                Files.writeString(path, config.encodeJsonDefault().toJson(true, true));
             } else {
                 try {
                     value = config.decodeJson(PropertyModifier.JANKSON.fromJson(Files.readString(path), JsonObject.class));
                 } catch (ConfigException e) {
-                    PropertyModifier.LOGGER.error("Caught error while reading config {}.json5", config.name, e);
+                    PropertyModifier.LOGGER.error("Caught error while reading config {}.json5, no changes from that file will be applied!", config.name, e);
                     continue;
                 }
             }

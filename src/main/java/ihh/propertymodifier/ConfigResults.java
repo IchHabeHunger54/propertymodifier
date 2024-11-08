@@ -1,5 +1,6 @@
 package ihh.propertymodifier;
 
+import ihh.propertymodifier.config.CoreConfig;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,7 +31,8 @@ public final class ConfigResults {
 
     public static final Map<EntityType<? extends LivingEntity>, Map<Attribute, Float>> ATTRIBUTE_BASE_VALUES = new HashMap<>();
 
-    @SuppressWarnings("deprecation")
+    public static CoreConfig CORE_CONFIG;
+
     public static void apply() {
         EXPLOSION_RESISTANCE.forEach((block, f) -> {
             block.explosionResistance = f;
