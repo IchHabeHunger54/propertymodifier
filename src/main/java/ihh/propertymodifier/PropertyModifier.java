@@ -3,7 +3,12 @@ package ihh.propertymodifier;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.api.SyntaxError;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.component.DataComponentMap;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -14,13 +19,23 @@ public final class PropertyModifier {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final Jankson JANKSON = new Jankson.Builder().build();
 
-    public PropertyModifier() {
+    public PropertyModifier(IEventBus bus) {
+        bus.addListener(EventPriority.LOWEST, FMLCommonSetupEvent.class, PropertyModifier::commonSetup);
+        bus.addListener(EventPriority.LOWEST, ModifyDefaultComponentsEvent.class, PropertyModifier::modifyDefaultComponents);
+    }
+
+    private static void commonSetup(FMLCommonSetupEvent event) {
         try {
             ConfigBootstrap.init();
+            ConfigResults.apply();
         } catch (IOException e) {
             LOGGER.error("Property Modifier failed to load config files due to exception", e);
         } catch (SyntaxError e) {
             LOGGER.error("Property Modifier encountered a malformed JSON5 file", e);
         }
+    }
+    
+    private static void modifyDefaultComponents(ModifyDefaultComponentsEvent event) {
+        ConfigResults.DEFAULT_COMPONENTS.forEach((item, list) -> event.modify(item, builder -> list.stream().flatMap(DataComponentMap::stream).forEach(builder::set)));
     }
 }
